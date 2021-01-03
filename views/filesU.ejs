@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <title></title>
+  <meta charset="utf-8">
+  <link href="/assets/styles/filesU.css" type="text/css" rel="stylesheet">
+  <link href="./" type="image/png" rel="icon">
+  </head>
+  <body>
+
+    <form method="POST" action="/newFolder">
+      <label for="folderName">Nombre de la carpeta</label>
+      <input type="text" id="folderName" name="folderName" placeholder="/files/route">
+      <button type="sumbit">Crear carpeta</button>
+    </form>
+    
+    <%if(files.length != 0){%>
+      <%files.forEach(file =>{%>
+            <%if(file.includes('.')){%>
+              <%toFiles(file);%>
+            <%}else{%>
+              <%toFolders(file);%>
+            <%}%>
+          <%});%>
+        <%}%>
+
+        <%function toFolders(file){%>
+          <ul>
+            <%if(files.length == 0){%>
+              <li><em>No folders found.</em></li>
+            <%}else{%>
+              <tr>
+                <td><img src="/assets/icons/folder.svg" class="listIcons"></td>
+                <td><%=file%></td>
+                <td><form method="POST" action="/<%=file%>"><button type="sumbit">Entrar</button></form></td>
+                <td><form method="POST" action="./remove/<%=file%>"><button type="submit">Eliminar</button></form></td>
+              </tr>
+            <%}%>
+          </ul>
+        <%}%>
+
+  <%function toFiles(file){%>
+    <ul>
+      <%if(files.length == 0){%>
+      <li><em>No files found.<em></li>
+    <% } else {%>
+        <tr>
+          <td><img src="/assets/icons/file.svg" class="listIcons"></td>
+          <td><%=file%></td>
+          <td><form method="POST" action="./download/<%=file%>"><button type="submit">Descargar</button></form></td>
+          <td><form method="POST" action="./remove/<%=file%>"><button type="submit">Eliminar</button></form></td>
+        </tr>
+    <% } %>
+    </ul>
+  <%}%>
+  <br>
+<br>
+<br>
+<a href="/">Home<a>
+    <a href="/filesU">Todos los archivos</a> 
+    <button onclick="window.history.back();">Atrás</button>
+  </body>
+  
+</html>
