@@ -3,6 +3,7 @@ const fs = require('fs-extra');
 const klaw = require('klaw');
 const path = './files/';
 const items = [];
+let toRedirect = "";
 
 module.exports = {
   index: async (req, res) =>{
@@ -66,35 +67,26 @@ try{
   remove: async (req, res) =>{
     try{
       let route2Remove = req.params.file2R;
+      let counter = 0;
       items.forEach(file2RM =>{
+        counter++;
         if(file2RM.includes(route2Remove)){
-          let toRedirect = file2RM;
           fs.remove(file2RM);
-          console.log(`Eliminando: ${route2Remove}`);
-          let redirecting = toRedirect.split('/').slice(0, -1).join('/');
-          console.log(redirecting);
-          //res.redirect('/deleteRedirect');
-          //redireccionar a la misma ruta (redirecting)
-          //return redirecting;
-              klaw(path)
-                .on('readable', function (){
-                let item
-                while((item = this.read())){
-                items.push(item.path);
-                }
-              }).on('end', () => console.dir(items)); 
-          fs.readdir(redirecting, (err, files) =>{
-            res.redirect('/filesU', redirecting);
-          });
-        }
+          toRedirect = file2RM;
+        } 
       })
+      //aqui
+      console.log(`Eliminando: ${route2Remove}`);
+      res.redirect('/deleteRedirect')
     }catch(err){
       console.log("Error: " + err);
     }
   },
- deleteRedirect: (req, res, redirecting)=>{
+ deleteRedirect: (req, res)=>{
     try{
-      console.log("Entra al delete redirect");
+      console.log("Entra al delete redirect"); 
+      let redirecting = toRedirect.split('/').slice(0, -1).join('/');
+      console.log(`Redirigir a: ${redirecting}`)
       fs.readdir(redirecting, (err, files)=>{
         res.render('filesU', { files });
       });
@@ -102,16 +94,6 @@ try{
       console.log(`Algo salió mal: ${err}`);
     }
   },
-  /*newFolder: (req, res)=>{
-    try{
-      (async () =>{
-        const path = await makeDir('./files/'+req.body.folderName);
-        console.log(path);
-      })();
-      res.redirect('/filesU');
-    }catch(err){
-      console.log("Algo salió mal: " + err);
-    }*/
   newFolder: async (req, res)=>{
     try{
       await fs.ensureDir(path+req.body.folderName)

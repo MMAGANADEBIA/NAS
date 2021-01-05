@@ -14,7 +14,7 @@
       <button type="sumbit">Crear carpeta</button>
     </form>
     
-    <%if(files.length != 0){%>
+    
       <%files.forEach(file =>{%>
             <%if(file.includes('.')){%>
               <%toFiles(file);%>
@@ -22,7 +22,7 @@
               <%toFolders(file);%>
             <%}%>
           <%});%>
-        <%}%>
+       
 
         <%function toFolders(file){%>
           <ul>
