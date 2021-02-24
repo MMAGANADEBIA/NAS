@@ -54,10 +54,13 @@
     </ul>
   <%}%>
   <br>
+  <p>Tamaño ocupado: <%=rootSize%> o <%=rootSizeGB%> </p>
+  <p>Espacio libre: <%=availableMB%></p>
 <br>
 <br>
-<a href="/">Home<a>
+    <form method="POST" action="/home"><button type="submit">home</button></form>
     <a href="/filesU">Todos los archivos</a> 
+    <!--<form method="POST" action="./back"><button type="submit">atras</button></form>-->
     <button onclick="window.history.back();">Atrás</button>
   </body>
   

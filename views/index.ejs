@@ -7,13 +7,17 @@
   <link href="./" type="image/png" rel="icon">
   </head>
   <body>
-    <h1>Sube archivos</h1>
-    <form action="upload" method="POST" enctype="multipart/form-data">
-      <input name="file" type="file">
-      <input type="submit" class="" id="" value="Subir">
-    </form>
-    <h1>Ver archivos</h1>
-      <a href="/filesU">Archivos</a>
+
+  <form method="POST" action="./home">
+    <label for="username">username</label>
+    <input type="text" class="" id="username" name="username">
+    <label for="password">password</label>
+    <input type="text" class="" id="password" name="password">
+    <button type="submit" class="" id="login">LogIn</button>
+  </form>
+
+  <a href="./createAccount">Crear cuenta</a>
+
   </body>
-  
+  <script type="text/javascript" src="./main.js"></script>
 </html>

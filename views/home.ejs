@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <title></title>
+  <meta charset="utf-8">
+  <link href="./" type="text/css" rel="stylesheet">
+  <link href="./" type="image/png" rel="icon">
+  </head>
+  <body>
+    <h1>Sube archivos</h1>
+    <form action="upload" method="POST" enctype="multipart/form-data">
+      <input name="file" type="file">
+      <input type="submit" class="" id="" value="Subir">
+    </form>
+    <h1>Ver archivos</h1>
+      <a href="/filesU">Archivos</a>
+      <a href="/">log out</a>
+      <br>
+      <br>
+      <br>
+      <form method="POST" action="/deleteAccount">
+        <button type="submit" class="" id="">Eliminar usuario</button>
+      </form>
+  </body>
+  
+</html>

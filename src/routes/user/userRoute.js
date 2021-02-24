@@ -5,8 +5,9 @@ var urlencodedParser = bodyParser.urlencoded({ extended: true });
 const router = express.Router();
 const fileUpload = require('express-fileupload');
 
-const { index } = require('../../controllers/user.js');
+const { index, home } = require('../../controllers/user.js');
 router.get('/', index);
+router.post('/home', urlencodedParser, home)
 
 const { filesU } = require('../../controllers/user.js');
 router.get('/filesU', filesU);
@@ -28,7 +29,22 @@ router.get('/deleteRedirect', urlencodedParser, deleteRedirect);
 const { newFolder } = require('../../controllers/user.js');
 router.post('/newFolder', urlencodedParser, newFolder);
 
-const { surf } = require('../../controllers/user.js');
-router.post('/:folder', urlencodedParser, surf); //'/surf/:folder'
+/*const { surf } = require('../../controllers/user.js');
+router.post('/:folder', urlencodedParser, surf);*/
+
+const { back } = require('../../controllers/user.js');
+router.post('/back', back);
+
+/*const { login, logeado } = require('../../controllers/user.js');
+router.get('/login', login);
+router.post('/logeado', urlencodedParser, logeado);*/
+
+const { createAccount, deleteAccount } = require('../../controllers/user.js');
+router.get('/createaccount', createAccount);
+router.post('/deleteAccount', deleteAccount)
+
+const { writeData } = require('../../controllers/user.js');
+router.post('/writeData', urlencodedParser, writeData);
+
 
 module.exports = router;
