@@ -17,6 +17,7 @@ let toRedirect = "";
 var diskusage = require('diskusage-ng');
 let actualUser
 let actualPassword
+let users = [];
 
 module.exports = {
   home: async (req, res) =>{
@@ -25,14 +26,16 @@ module.exports = {
       let username = req.body.username;
       let password = req.body.password;
       actualUser = username;
-      //res.send("logeandose");
-      if(username == './src/users/'+username+'.json'){
+      actualPassword = password;
+      users.forEach(user2find => {
+        //console.log(user2find)
+      if(user2find.includes(username)){
       fs.readJson('./src/users/'+username+'.json', (err, userObj) => {
         if(err) console.log(err)
-        //console.log(userObj.username)
+        console.log(userObj.username) //vamos a ver si llega
         if(password == userObj.password){
           console.log("Son iguales")
-        klaw(path)
+        klaw(path+actualUser)
         .on('readable', function (){
           let item
           while((item = this.read())){
@@ -48,8 +51,22 @@ module.exports = {
         }
       });
       }else{
-        res.send('Usuario o contraseña erronea jgjh');
+          fs.readJson(`./src/users/${actualUser}.json`, (err, userObj) =>{
+          if(err) console.log(err);
+          if(actualPassword == userObj.password){
+            console.log("son iguales");
+            klaw(`${path}${actualUser}`)
+              .on('readable', function(){
+                while((item = this.read())){
+                  items.push(item.path);
+                }
+              }).on('end', () => console.dir(items));
+            res.render('home');
+          }
+        })
       }
+        
+    })
     }catch(error){
       res.send('Algo salió mal home' + error);
     }
@@ -57,7 +74,7 @@ module.exports = {
   filesU: async(req, res)=>{
     try{
       //get-folder-size module
-      getSize('./files', (err, size)=>{
+      getSize(`./files/${actualUser}`, (err, size)=>{
         if(err){throw err;}
         console.log(size + ' bytes');
         rootSize = (size / 1024 / 1024).toFixed(2) + ' MB'; 
@@ -72,7 +89,7 @@ module.exports = {
       //get space on disk
        
       //Diskusage-ng
-      diskusage('./files', function(err, usage){
+      diskusage(`./files/${actualUser}`, function(err, usage){
         if (err) return console.log(err)
         let total = usage.total;
         totalMB = (total / 1024 / 1024).toFixed(2) + ' MB'
@@ -89,7 +106,7 @@ module.exports = {
       })
       //Diskusage-ng
 
-      fs.readdir('./files', (err, files) =>{
+      fs.readdir(`./files/${actualUser}`, (err, files) =>{
         res.render('filesU', {files, rootSize, rootSizeGB, availableMB, availableGB, totalMB, totalGB, folderSize});
       });
       
@@ -220,6 +237,15 @@ try{
   },
   index: async (req, res) =>{
     try{
+
+      klaw('./src/users/')
+        .on('readable', function(){
+          let user;
+          while((user = this.read())){
+            users.push(user.path);
+          }
+        })
+        .on('end', () => console.dir(users));
       res.render('index');
     }catch(err){
       console.log(`Algo salió mal: ${err}`);
@@ -243,6 +269,11 @@ try{
       fs.writeJson('./src/users/'+username+'.json', { username: username, password: password, securityQuestion: securityQuestion, securityAnswer: securityAnswer }, err => {
         if ( err ) return console.error(err)
         console.log('success');
+        //crear carpeta
+        fs.ensureDir(`${path}${username}`, err =>{
+          console.log(err)
+        })
+        
       })
 
       //console.log(username, password, securityQuestion, securityAnswer);
@@ -291,4 +322,54 @@ try{
       console.log(error);
     }
   }*/
+  ,
+  recoverPassword: async (req, res) => {
+    try{
+      res.render('recoverPassword');
+    }catch(err){
+      console.log(`Algo salió mal: ${err}`)
+    }
+  },
+  passwordInfo: async(req, res) =>{
+    try{
+      //res.render('passwordInfo');
+      let username = req.body.username;
+      users.forEach(user2find =>{
+        if (user2find.includes(username)){
+          //console.log(`Usuario encontrado: ${user2find}`);
+          fs.readJson(`./src/users/${username}.json`, (err, userObj)=>{
+            if ( err ) console.error(err)
+            //console.log(userObj.password);
+            res.render('passwordInfo', { userObj })
+          })
+        }
+      })
+
+    }catch(err){
+      res.send(err);
+    }
+  },
+  infoGiven: async(req, res)=>{
+    try{
+      //res.send("hola");
+      let securityAnswer = req.body.securityAnswer;
+      let username = req.body.username;
+      //console.log(securityAnswer, username);
+      fs.readJson(`./src/users/${username}.json`, (err, userObj)=>{
+        if(err){
+          console.error(err);
+        }else{
+          if (securityAnswer == userObj.securityAnswer){
+            console.log(userObj.password);
+            res.render('infoGiven', { userObj });
+          }else{
+            res.send("Respuesta de seguridad invalida.");
+          }
+        }
+
+      })
+    }catch(err){
+      res.send(err);
+    }
+  }
 }

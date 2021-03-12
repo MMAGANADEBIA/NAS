@@ -5,9 +5,12 @@ var urlencodedParser = bodyParser.urlencoded({ extended: true });
 const router = express.Router();
 const fileUpload = require('express-fileupload');
 
-const { index, home } = require('../../controllers/user.js');
+const { index, home, recoverPassword, passwordInfo, infoGiven} = require('../../controllers/user.js');
 router.get('/', index);
 router.post('/home', urlencodedParser, home)
+router.get('/recoverPassword', recoverPassword);
+router.post('/passwordInfo', urlencodedParser, passwordInfo);
+router.post('/infoGiven', urlencodedParser, infoGiven);
 
 const { filesU } = require('../../controllers/user.js');
 router.get('/filesU', filesU);
