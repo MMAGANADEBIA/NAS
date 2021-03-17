@@ -5,7 +5,7 @@ var urlencodedParser = bodyParser.urlencoded({ extended: true });
 const router = express.Router();
 const fileUpload = require('express-fileupload');
 
-const { index, home, recoverPassword, passwordInfo, infoGiven} = require('../../controllers/user.js');
+const { index, home, recoverPassword, passwordInfo, infoGiven, surf} = require('../../controllers/user.js');
 router.get('/', index);
 router.post('/home', urlencodedParser, home)
 router.get('/recoverPassword', recoverPassword);
@@ -32,8 +32,7 @@ router.get('/deleteRedirect', urlencodedParser, deleteRedirect);
 const { newFolder } = require('../../controllers/user.js');
 router.post('/newFolder', urlencodedParser, newFolder);
 
-/*const { surf } = require('../../controllers/user.js');
-router.post('/:folder', urlencodedParser, surf);*/
+router.post('/:folder', urlencodedParser, surf);
 
 const { back } = require('../../controllers/user.js');
 router.post('/back', back);

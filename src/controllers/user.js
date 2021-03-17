@@ -1,5 +1,5 @@
 const fs = require('fs-extra');
-const fs1 = require('fs')
+//const fs1 = require('fs')
 const getSize = require('get-folder-size');
 let rootSize
 let rootSizeGB
@@ -10,32 +10,30 @@ let totalMB
 let totalGB
 const klaw = require('klaw');
 const path = './files/';
-let routeGS
+let routeToFolder;
 const items = [];
 let toRedirect = "";
 //const df = require('@keltharan/df');
 var diskusage = require('diskusage-ng');
-let actualUser
-let actualPassword
+let username;
+let password;
 let users = [];
 
 module.exports = {
   home: async (req, res) =>{
     try{
-
-      let username = req.body.username;
-      let password = req.body.password;
-      actualUser = username;
-      actualPassword = password;
-      users.forEach(user2find => {
-        //console.log(user2find)
-      if(user2find.includes(username)){
-      fs.readJson('./src/users/'+username+'.json', (err, userObj) => {
+      if(username === null || username === undefined){
+        username = req.body.username;
+        password = req.body.password;
+      }
+        users.forEach(user2find => {
+        if(user2find.includes(username)){
+        fs.readJson('./src/users/'+username+'.json', (err, userObj) => {
         if(err) console.log(err)
         console.log(userObj.username) //vamos a ver si llega
         if(password == userObj.password){
           console.log("Son iguales")
-        klaw(path+actualUser)
+        klaw(path+username)
         .on('readable', function (){
           let item
           while((item = this.read())){
@@ -50,23 +48,9 @@ module.exports = {
           res.send("usuario o contraseña erronea");
         }
       });
-      }else{
-          fs.readJson(`./src/users/${actualUser}.json`, (err, userObj) =>{
-          if(err) console.log(err);
-          if(actualPassword == userObj.password){
-            console.log("son iguales");
-            klaw(`${path}${actualUser}`)
-              .on('readable', function(){
-                while((item = this.read())){
-                  items.push(item.path);
-                }
-              }).on('end', () => console.dir(items));
-            res.render('home');
-          }
-        })
       }
-        
     })
+        //console.log("if de home"); 
     }catch(error){
       res.send('Algo salió mal home' + error);
     }
@@ -74,7 +58,7 @@ module.exports = {
   filesU: async(req, res)=>{
     try{
       //get-folder-size module
-      getSize(`./files/${actualUser}`, (err, size)=>{
+      getSize(`./files/${username}`, (err, size)=>{
         if(err){throw err;}
         console.log(size + ' bytes');
         rootSize = (size / 1024 / 1024).toFixed(2) + ' MB'; 
@@ -89,7 +73,7 @@ module.exports = {
       //get space on disk
        
       //Diskusage-ng
-      diskusage(`./files/${actualUser}`, function(err, usage){
+      diskusage(`./files/${username}`, function(err, usage){
         if (err) return console.log(err)
         let total = usage.total;
         totalMB = (total / 1024 / 1024).toFixed(2) + ' MB'
@@ -106,7 +90,7 @@ module.exports = {
       })
       //Diskusage-ng
 
-      fs.readdir(`./files/${actualUser}`, (err, files) =>{
+      fs.readdir(`./files/${username}`, (err, files) =>{
         res.render('filesU', {files, rootSize, rootSizeGB, availableMB, availableGB, totalMB, totalGB, folderSize});
       });
       
@@ -136,12 +120,13 @@ try{
   upload: async (req, res)=>{
    try{
     let nFile = req.files.file;
-    nFile.mv(`./files/${nFile.name}`, err=>{
+    nFile.mv(`./files/${username}/${nFile.name}`, err=>{
       if(err){
         //return res.status(500).send({ message: err });
         res.send("Algo salió mal " + err);
       }else{
-        res.redirect('/');
+        //res.redirect('/');
+        res.redirect('filesU')
       }
     });
    }catch(error){
@@ -180,13 +165,21 @@ try{
   },
   newFolder: async (req, res)=>{
     try{
-      await fs.ensureDir(path+req.body.folderName)
-      res.redirect('/filesU');
+      let nFolder = req.body.folderName;
+      //console.log("probando ruta: " + routeToFolder);
+      if(routeToFolder === null || routeToFolder === undefined){
+        console.log("IF?")
+        await fs.ensureDir(`${path}${username}/${nFolder}`) //me quede aqui, intenta agregar a la ruta
+      }else{
+        console.log("ELSE?")
+        await fs.ensureDir(`${routeToFolder}/${nFolder}`);
+      }
+        res.redirect('/filesU');
     }catch(err){
       console.log("Algo salió mal: newFolder" + err);
     }
   },
-  /*surf: async (req, res) =>{
+  surf: async (req, res) =>{
     try{
       let folder2search = req.params.folder;
       items.forEach(file2GetSize =>{ //revisar esta madre
@@ -204,13 +197,12 @@ try{
         console.log(rootSize)
       })
 
-      //diskusage-ng
-
-      //diskusage-ng
-
       items.forEach(route=>{
         if(route.includes(folder2search)){ 
+          routeToFolder = route;
+          console.log(route);
           fs.readdir(route, (err, files)=>{
+            if(err) console.log(err);
             res.render('filesU', {files, rootSize, rootSizeGB, availableMB, availableGB, totalMB, totalGB});
           })
         }
@@ -218,7 +210,7 @@ try{
     }catch(err){
       console.log("Algo salió mal: surf " + err);
     }
-  },*/
+  },
   back: (req, res) =>{
     try{
       console.log("Entra en back");
