@@ -7,6 +7,11 @@
   <link href="./" type="image/png" rel="icon">
   </head>
   <body>
+    
+    <form action="upload" method="POST" enctype="multipart/form-data">
+      <input name="file" type="file">
+      <input type="submit" class="" id="" value="Subir">
+    </form>
 
     <form method="POST" action="/newFolder">
       <label for="folderName">Nombre de la carpeta</label>

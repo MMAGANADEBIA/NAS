@@ -120,15 +120,27 @@ try{
   upload: async (req, res)=>{
    try{
     let nFile = req.files.file;
+     if(routeToFolder === null || routeToFolder === undefined){
     nFile.mv(`./files/${username}/${nFile.name}`, err=>{
       if(err){
-        //return res.status(500).send({ message: err });
+        return res.status(500).send({ message: err });
         res.send("Algo salió mal " + err);
       }else{
         //res.redirect('/');
+        console.log(routeToFolder);
         res.redirect('filesU')
       }
     });
+     }else{
+       nFile.mv(`${routeToFolder}/${nFile.name}`, err =>{
+         if(err){
+           res.send(`Algo salió mal else nfile: ${err}`);
+         }else{
+           console.log(routeToFolder);
+           res.redirect('filesU');
+         }
+       })
+     }
    }catch(error){
      res.send("Algo salió mal " + error);
    }
@@ -229,7 +241,8 @@ try{
   },
   index: async (req, res) =>{
     try{
-
+      username = null;
+      password = null;
       klaw('./src/users/')
         .on('readable', function(){
           let user;
@@ -362,6 +375,23 @@ try{
       })
     }catch(err){
       res.send(err);
+    }
+  },
+  uploadRoute: async(req, res)=>{
+    try{
+      let nFile = req.files;
+      nFile.mv(`./files/${username}/${nFile.name}`, err=>{
+      if(err){
+        //return res.status(500).send({ message: err });
+        res.send("Algo salió mal " + err);
+        console.log(err);
+      }else{
+        //res.redirect('/');
+        res.redirect('filesU')
+      }
+    });
+    }catch(err){
+      res.send(`Algo salió mal: ${err}`);
     }
   }
 }
